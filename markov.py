@@ -33,7 +33,7 @@ class SimpleMarkovGenerator(object):
             chain_dict.setdefault(key, []).append(value)
         self.chains = chain_dict
 
-    def make_text(self, limit=140):
+    def make_text(self, limit=150):
         """Takes dictionary of markov chains; returns random text."""
 
         random_key = choice(self.chains.keys())
