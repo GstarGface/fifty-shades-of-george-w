@@ -7,7 +7,6 @@ class SimpleMarkovGenerator(object):
     def read_files(self, the_file1, the_file2):
         """Given a list of files, make chains from them."""
 
-        # your code here
         file_object1 = open(the_file1)
         all_text1 = file_object1.read()
         corpus_text1 = all_text1.replace("\n", " ").split(" ")
@@ -17,64 +16,54 @@ class SimpleMarkovGenerator(object):
         corpus_text2 = all_text2.replace("\n", " ").split(" ")
 
         corpus_text = corpus_text1 + corpus_text2
-        return corpus_text
+        self.corpus_text = corpus_text
+
+        self.make_chains()
 
 
-
-
-    def make_chains(self, corpus_text):
+    def make_chains(self):
         """Takes input text as string; stores chains."""
 
     
         chain_dict = {}
-        i = 0
-        for i in range(len(corpus_text)-2):
-            key = tuple([corpus_text[i], corpus_text[i +1]])
-            value = corpus_text[i+2]
+        for i in range(len(self.corpus_text)-2):
+            key = tuple([self.corpus_text[i], self.corpus_text[i +1]])
+            value = self.corpus_text[i+2]
            
             chain_dict.setdefault(key, []).append(value)
-            i += 1
+        self.chains = chain_dict
 
-        return chain_dict 
-
-    def make_text(self, chains):
+    def make_text(self, limit=140):
         """Takes dictionary of markov chains; returns random text."""
 
-        # your code here
-
-
-        random_key = choice(chains.keys())
-        random_val = choice(chains[random_key])
-        first_phrase = [random_key[0], random_key[1],  random_val]
-        #print first_phrase
+        random_key = choice(self.chains.keys())
+        random_val = choice(self.chains[random_key])
+        first_phrase = [random_key[0], random_key[1], random_val]
         
         
         next_key = (first_phrase[-2], first_phrase[-1])
-        #print next_key
 
-        while next_key in chains:
-            first_phrase.append(choice(chains[next_key]))
-            # print first_phrase
-            next_key = (first_phrase[-2], first_phrase[-1])
+
+        while next_key in self.chains:
+            next_key_list = list(next_key)
+            check_limit_list = first_phrase + next_key_list
+            check_limit = " ".join(check_limit_list)
+
+            if len(check_limit) < limit:
+                first_phrase.append(choice(self.chains[next_key]))
+                next_key = (first_phrase[-2], first_phrase[-1])
+            else:
+                break
             
         sentence = " ".join(first_phrase)
-        print sentence 
+        return sentence 
 
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     # we should get list of filenames from sys.argv
-#     # we should make an instance of the class
-#     # we should call the read_files method with the list of filenames
-#     # we should call the make_text method 5x
+    Test_Markov_Generator = SimpleMarkovGenerator()
+    Test_Markov_Generator.read_files(sys.argv[1], sys.argv[2])
+    sentence = Test_Markov_Generator.make_text()
 
-
-#     pass
-
-
-Test_Markov_Generator = SimpleMarkovGenerator()
-
-files_read = Test_Markov_Generator.read_files(sys.argv[1], sys.argv[2]) 
-chains_made = Test_Markov_Generator.make_chains(files_read)
-text_made = Test_Markov_Generator.make_text(chains_made)
+    print sentence
